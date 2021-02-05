@@ -1,0 +1,5 @@
+server:
+  port: 7777
+netty:
+  server:
+    port: 11111
