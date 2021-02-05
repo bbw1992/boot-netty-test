@@ -7,6 +7,8 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
+import java.nio.charset.Charset;
+
 public class HeartbeatInitializer extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel channel) {
@@ -15,8 +17,8 @@ public class HeartbeatInitializer extends ChannelInitializer<Channel> {
 //                .addLast(new LengthFieldBasedFrameDecoder(1024, 0, 4, 0, 4))
                 //换行分割
                 .addLast(new LineBasedFrameDecoder(1024))
-                .addLast(new StringDecoder())
-                .addLast(new StringEncoder())
+                .addLast(new StringDecoder(Charset.forName("GBK")))
+                .addLast(new StringEncoder(Charset.forName("UTF-8")))
                 .addLast(new HeartBeatSimpleHandle());
     }
 }
