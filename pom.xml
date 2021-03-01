@@ -13,10 +13,12 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>boot-netty-test</name>
     <description>Netty Test project for Spring Boot</description>
+
     <modules>
-        <module>client</module>
-        <module>server</module>
+        <module>netty-client</module>
+        <module>netty-server</module>
     </modules>
+
     <properties>
         <java.version>1.8</java.version>
     </properties>

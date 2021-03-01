@@ -64,12 +64,19 @@ public class HeartBeatSimpleHandle extends SimpleChannelInboundHandler<ByteBuf> 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         log.info("handlerAdded");
+        ChannelUtil.channelMap.put(ctx.channel().id().asLongText(), ctx.channel());
+
+        log.info("当前用户id ： {}", ctx.channel().id().asLongText());
+        log.info("当前用户数 ： {}", ChannelUtil.channelMap.size());
         super.handlerAdded(ctx);
     }
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         log.info("handlerRemoved");
+        ChannelUtil.channelMap.remove(ctx.channel().id().asLongText());
+        log.info("移除当前用户id ： {}", ctx.channel().id().asLongText());
+        log.info("移除后用户数 ： {}", ChannelUtil.channelMap.size());
         super.handlerRemoved(ctx);
     }
 
