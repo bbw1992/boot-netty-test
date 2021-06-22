@@ -4,8 +4,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -38,7 +41,7 @@ public class HeartBeatSimpleHandle extends SimpleChannelInboundHandler<ByteBuf> 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         log.info("channelRegistered");
-        String ip= ChannelUtil.getIp(ctx);
+        String ip = ChannelUtil.getIp(ctx);
         ChannelUtil.channelMap.put(ip, ctx.channel());
         for (Map.Entry<String, Channel> m : ChannelUtil.channelMap.entrySet()) {
             log.info("key:" + m.getKey());
@@ -47,7 +50,7 @@ public class HeartBeatSimpleHandle extends SimpleChannelInboundHandler<ByteBuf> 
         }
         log.info("当前用户数 ： {}", ChannelUtil.channelMap.size());
         ChannelFuture future = ChannelUtil.channelMap.get(ip).writeAndFlush("register successed");
-        if(future.isDone()){
+        if (future.isDone()) {
             log.info(String.format("发送结果 ： %s", future.isSuccess()));
         }
         super.channelRegistered(ctx);
@@ -100,14 +103,43 @@ public class HeartBeatSimpleHandle extends SimpleChannelInboundHandler<ByteBuf> 
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
         log.info("ByteBuf={}", byteBuf);
+
+        byte[] barray = new byte[byteBuf.readableBytes()];
+        byteBuf.getBytes(0, barray);
+        log.info("ByteBuf array={}", Arrays.toString(barray));
+
+        byte[] bytes = new byte[byteBuf.readableBytes()];
+        byteBuf.duplicate().readBytes(bytes);
+        log.info(new String(bytes, CharsetUtil.ISO_8859_1));
+        log.info(new String(bytes, CharsetUtil.US_ASCII));
+        log.info(new String(bytes, CharsetUtil.UTF_8));
+        log.info(new String(bytes, CharsetUtil.UTF_16));
+        log.info(new String(bytes, CharsetUtil.UTF_16LE));
+        log.info(new String(bytes, Charset.forName("GBK")));
+
+        log.info("byteBuf={}", byteBuf);
+        log.info("count : " + count.addAndGet(1));
+
+        ChannelFuture future = ctx.writeAndFlush("11111111111111111111111111111111111111111111111111111111111111111111111111111111111");
+        if (future.isDone()) {
+            log.info(String.format("发送结果 ： %s", future.isSuccess()));
+            if (!future.isSuccess()) log.info(String.format("exception ： %s", future.cause().getMessage()));
+        }
+
+
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         log.info("msg={}", msg);
-        log.info("count : " + count.addAndGet(1));
+
+        ChannelFuture future = ctx.writeAndFlush("11111111111111111111111111111111111111111111111111111111111111111111111111111111111");
+        if (future.isDone()) {
+            log.info(String.format("发送结果 ： %s", future.isSuccess()));
+            if (!future.isSuccess()) log.info(String.format("exception ： %s", future.cause().getMessage()));
+        }
         super.channelRead(ctx, msg);
     }
 }
